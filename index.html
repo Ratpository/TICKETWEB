@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rush Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Authentication Section -->
+    <div id="auth-section" class="container auth-container">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="card-title mb-4">Ticket Master</h2>
+                <p class="mb-4">Please sign in with your Google account to access the ticket system.</p>
+                <div id="g_id_onload"
+                    data-client_id="770233034060-6h18rtujn6mp8mq4dis29oooddbo72mn.apps.googleusercontent.com"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-callback="handleCredentialResponse"
+                    data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-shape="rectangular"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-logo_alignment="left">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Content (hidden until authenticated) -->
+    <div id="app-content">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <button class="btn btn-light me-3" id="menu-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a class="navbar-brand" href="#">Ticket Master</a>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="badge me-3" id="user-role-badge"></span>
+                    <button class="btn btn-light" id="signout-btn">
+                        <i class="bi bi-box-arrow-right me-2"></i>Sign out
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- User Info -->
+        <div class="container mt-3">
+            <div class="user-info">
+                <span><strong>Logged in as:</strong> <span id="user-email"></span></span>
+                <span class="ms-3"><strong>Role:</strong> <span id="user-role"></span></span>
+            </div>
+        </div>
+
+        <!-- Drawer -->
+        <div class="drawer" id="drawer">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Ticket Status</h4>
+                <button class="btn btn-sm btn-outline-secondary" id="close-drawer">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active filter-link" href="#" data-filter="all">All Tickets</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Not Started">Not Started</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Cutting">Cutting</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Sewing">Sewing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Found Vinyl">Found Vinyl</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Cutting Foam">Cutting Foam</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Stuffing">Stuffing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link filter-link" href="#" data-filter="Done">Done</a>
+                </li>
+            </ul>
+        </div>
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Main Content -->
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 id="current-filter">All Tickets</h3>
+                        <button class="btn btn-primary editable" id="add-ticket-btn">
+                            <i class="bi bi-plus-circle me-2"></i>Add Ticket
+                        </button>
+                    </div>
+                    
+                    <div id="tickets-container" class="row">
+                        <!-- Tickets will be loaded here -->
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading tickets...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Ticket Modal -->
+        <div class="modal fade" id="addTicketModal" tabindex="-1" aria-labelledby="addTicketModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTicketModalLabel">Add New Ticket</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="ticket-form">
+                            <div class="form-section">
+                                <h5>Basic Information</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="dealer" class="form-label">Dealer*</label>
+                                        <input type="text" class="form-control" id="dealer" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="poNumber" class="form-label">PO# / P/U / DEL*</label>
+                                        <input type="text" class="form-control" id="poNumber" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="size" class="form-label">Size</label>
+                                        <input type="text" class="form-control" id="size">
+                                    </div>
+                                    <div class="col-md-4">
+                                    <label for="color" class="form-label">Color</label>
+                                        <select class="form-control" id="color">
+                                            <option value="">Select Color</option>
+                                            <option value="Dark Brown">Dark Brown</option>
+                                            <option value="Light Brown">Mahogany</option>
+                                            <option value="Forest Green">Forest Green</option>
+                                            <option value="Dark Gray">Dark Gray</option>
+                                            <option value="Light Gray">Light Gray</option>
+                                            <option value="Dark Blue">Dark Blue</option>
+                                            <option value="Teal">Teal</option>
+                                            <option value="Light Blue">Light Blue</option>
+                                            <option value="Charcoal">Charcoal</option>
+                                            <option value="Almond">Almond</option>
+                                            <option value="Palamino">Palamino</option>
+                                            <option value="Charcoal Canvas">Charcoal Canvas</option>
+                                            <option value="Custom">Custom Read Note</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="date" class="form-label">Date</label>
+                                        <input type="date" class="form-control" id="date">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5>Flap Details</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="cutFlapSize" class="form-label">Cut Flap Size</label>
+                                        <input type="text" class="form-control" id="cutFlapSize">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="flapSize" class="form-label">Flap Size</label>
+                                        <input type="text" class="form-control" id="flapSize">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Connected Flaps</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="connectedFlaps" checked>
+                                            <label class="form-check-label" for="connectedFlaps">Connected</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5>Tie Down Details</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="tieDownsNumber" class="form-label">Tie Downs #</label>
+                                        <input type="text" class="form-control" id="tieDownsNumber">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tieDownLocation" class="form-label">Tie Down Location</label>
+                                        <input type="text" class="form-control" id="tieDownLocation">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tieDownSize" class="form-label">Tie Down Size</label>
+                                        <input type="text" class="form-control" id="tieDownSize">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="cutTieDownSize" class="form-label">Cut Tie Down Size</label>
+                                        <input type="text" class="form-control" id="cutTieDownSize">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+    <h5>Other Components</h5>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="connectorNumber" class="form-label">Connector #</label>
+            <input type="text" class="form-control" id="connectorNumber">
+        </div>
+        <div class="col-md-4">
+            <label for="velcroNumber" class="form-label">Velcro #</label>
+            <input type="text" class="form-control" id="velcroNumber">
+        </div>
+        <div class="col-md-4">
+            <label for="foamSize" class="form-label">Foam Size</label>
+            <select class="form-control" id="foamSize">
+                <option value="">Standard</option>
+                <option value="Dark Brown">5"-2.5"</option>
+                <option value="Light Brown">4-5-4</option>
+                <option value="Forest Green">6"-4"</option>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Double Plastic</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="doublePlastic">
+                <label class="form-check-label" for="doublePlastic">Enabled</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Webbing</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="webbing">
+                <label class="form-check-label" for="webbing">Enabled</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Metal For Lifter</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="metalForLifter">
+                <label class="form-check-label" for="metalForLifter">Enabled</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Steam Stopper</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="steamStopper">
+                <label class="form-check-label" for="steamStopper">Enabled</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Rush Order</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="rushOrder">
+                <label class="form-check-label" for="rushOrder">Enable Rush Order</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+                            
+
+                            <div class="form-section">
+                                <h5>Additional Information</h5>
+                                <div class="mb-3">
+                                    <label for="extraNotes" class="form-label">Extra Notes</label>
+                                    <textarea class="form-control" id="extraNotes" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="save-ticket-btn">Save Ticket</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Detail Modal -->
+        <div class="modal fade" id="ticketDetailModal" tabindex="-1" aria-labelledby="ticketDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ticketDetailModalLabel">Ticket Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="ticket-detail-content">
+                        <!-- Ticket details will be loaded here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger me-auto editable" id="delete-ticket-btn">Delete Ticket</button>
+                        <button type="button" class="btn btn-info" id="print-ticket-btn">
+                            <i class="bi bi-printer me-2"></i>Print/Save as PDF
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google API and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        // GitHub configuration
+        const GITHUB_TOKEN = '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';
+        const REPO_OWNER = 'Ratpository';
+        const REPO_NAME = 'TIcketMaster';
+        const BRANCH = 'main';
+        const FILE_PATH = 'tickets.json';
+
+        // App state
+        let currentUser = null;
+        let currentFilter = 'all';
+        let tickets = [];
+        let currentTicket = null;
+
+        // Handle Google Sign-In response
+        function handleCredentialResponse(response) {
+            // Decode the JWT token to get user info
+            const responsePayload = JSON.parse(atob(response.credential.split('.')[1]));
+            
+            currentUser = {
+                email: responsePayload.email,
+                name: responsePayload.name,
+                picture: responsePayload.picture
+            };
+            
+            // Check access
+            checkUserAccess(currentUser.email);
+        }
+
+        async function checkUserAccess(email) {
+            try {
+                const response = await fetch('access_emails.json');
+                const accessData = await response.json();
+                
+                if (accessData.admins.includes(email)) {
+                    currentUser.role = 'admin';
+                    initializeApp();
+                } else if (accessData.viewers.includes(email)) {
+                    currentUser.role = 'viewer';
+                    initializeApp();
+                } else {
+                    alert('Please Contact Site Admin To Recieve Access');
+                    signOut();
+                }
+            } catch (error) {
+                console.error('Error checking access:', error);
+                alert('Error checking access permissions.');
+            }
+        }
+
+        function signOut() {
+            // Clear user data
+            currentUser = null;
+            document.getElementById('app-content').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'block';
+            
+            // Google Sign-Out
+            google.accounts.id.disableAutoSelect();
+        }
+
+        function initializeApp() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+            document.getElementById('user-email').textContent = currentUser.email;
+            document.getElementById('user-role').textContent = currentUser.role;
+            
+            // Set up UI based on user role
+            const userRoleBadge = document.getElementById('user-role-badge');
+            if (currentUser.role === 'admin') {
+                userRoleBadge.className = 'badge bg-danger';
+                userRoleBadge.textContent = 'Admin';
+            } else {
+                userRoleBadge.className = 'badge bg-secondary';
+                userRoleBadge.textContent = 'Viewer';
+                // Disable edit functionality for viewers
+                document.getElementById('add-ticket-btn').style.display = 'none';
+                document.querySelectorAll('.editable').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+            
+            // Initialize ticket system
+            initTicketSystem();
+        }
+
+        // Ticket System Functions
+        function initTicketSystem() {
+            // Set up event listeners
+            document.getElementById('signout-btn').addEventListener('click', signOut);
+            document.getElementById('menu-toggle').addEventListener('click', toggleDrawer);
+            document.getElementById('close-drawer').addEventListener('click', toggleDrawer);
+            document.getElementById('overlay').addEventListener('click', toggleDrawer);
+            
+            document.querySelectorAll('.filter-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentFilter = link.dataset.filter;
+                    document.getElementById('current-filter').textContent = link.textContent;
+                    document.querySelectorAll('.filter-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    renderTickets();
+                });
+            });
+
+            document.getElementById('add-ticket-btn').addEventListener('click', () => {
+                document.getElementById('date').valueAsDate = new Date();
+                new bootstrap.Modal(document.getElementById('addTicketModal')).show();
+            });
+
+            document.getElementById('save-ticket-btn').addEventListener('click', saveTicket);
+            document.getElementById('delete-ticket-btn').addEventListener('click', deleteTicket);
+            document.getElementById('print-ticket-btn').addEventListener('click', printTicket);
+
+            // Load tickets
+            loadTickets();
+        }
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function loadTickets() {
+            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?ref=${BRANCH}`;
+            const ticketsContainer = document.getElementById('tickets-container');
+
+            ticketsContainer.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading tickets...</p>
+                </div>
+            `;
+
+            fetch(url, {
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(response => {
+                if (response.status === 404) {
+                    tickets = [];
+                    renderTickets();
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.content) {
+                    const content = atob(data.content.replace(/\s/g, ''));
+                    tickets = JSON.parse(content);
+                    renderTickets();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading tickets:', error);
+                ticketsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-danger">
+                            Error loading tickets. Please try again later.
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function saveTicketsToGitHub() {
+            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+            
+            // Check if file exists to get its SHA for update
+            fetch(url, {
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+            .then(response => response.status === 200 ? response.json() : { sha: null })
+            .then(data => {
+                const content = JSON.stringify(tickets, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                
+                const body = {
+                    message: `Update tickets at ${new Date().toISOString()}`,
+                    content: encodedContent,
+                    branch: BRANCH
+                };
+                
+                if (data.sha) {
+                    body.sha = data.sha;
+                }
+                
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Tickets saved to GitHub:', data);
+            })
+            .catch(error => {
+                console.error('Error saving tickets to GitHub:', error);
+                alert('Error saving tickets to GitHub. Please try again later.');
+            });
+        }
+
+        function renderTickets() {
+            const ticketsContainer = document.getElementById('tickets-container');
+            
+            if (tickets.length === 0) {
+                ticketsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <p>No tickets found</p>
+                        ${currentUser.role === 'admin' ? 
+                            '<button class="btn btn-primary" id="add-ticket-empty-btn"><i class="bi bi-plus-circle me-2"></i>Add Your First Ticket</button>' : 
+                            ''}
+                    </div>
+                `;
+                
+                if (currentUser.role === 'admin') {
+                    document.getElementById('add-ticket-empty-btn').addEventListener('click', () => {
+                        document.getElementById('add-ticket-btn').click();
+                    });
+                }
+                return;
+            }
+
+            let filteredTickets = tickets;
+            if (currentFilter !== 'all') {
+                filteredTickets = tickets.filter(ticket => ticket.status === currentFilter);
+            }
+
+            ticketsContainer.innerHTML = filteredTickets.map(ticket => `
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card ticket-card h-100 ${ticket.rushOrder ? 'rush-order-border' : ''}" data-id="${ticket.id}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="card-title">${ticket.dealer}</h5>
+                    <span class="badge ${getStatusBadgeClass(ticket.status)}">${ticket.status}</span>
+                </div>
+                <div class="d-flex mb-2">
+                    <span class="me-3"><strong>Size:</strong> ${ticket.size || 'N/A'}</span>
+                    <span><strong>Color:</strong> ${ticket.color || 'N/A'}</span>
+                </div>
+                <p class="card-text"><strong>PO#:</strong> ${ticket.poNumber}</p>
+                <p class="card-text"><small class="text-muted">Created: ${formatDate(ticket.date)}</small></p>
+            </div>
+        </div>
+    </div>
+`).join('');
+
+            // Add click event to each card
+            document.querySelectorAll('.ticket-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const ticketId = card.dataset.id;
+                    showTicketDetails(ticketId);
+                });
+            });
+        }
+
+        function getStatusBadgeClass(status) {
+            const statusClasses = {
+                'Not Started': 'bg-secondary',
+                'Cutting': 'bg-info text-dark',
+                'Sewing': 'bg-primary',
+                'Found Vinyl': 'bg-warning text-dark',
+                'Cutting Foam': 'bg-info text-dark',
+                'Stuffing': 'bg-primary',
+                'Done': 'bg-success'
+            };
+            return statusClasses[status] || 'bg-light text-dark';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        function showTicketDetails(ticketId) {
+            currentTicket = tickets.find(t => t.id === ticketId);
+            if (!currentTicket) return;
+
+            const detailContent = document.getElementById('ticket-detail-content');
+            detailContent.innerHTML = `
+                <div class="ticket-print">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4>${currentTicket.dealer}</h4>
+                            <span class="badge ${getStatusBadgeClass(currentTicket.status)}">${currentTicket.status}</span>
+                        </div>
+                        <div class="d-flex">
+                            <span class="me-3"><strong>Size:</strong> ${currentTicket.size || 'N/A'}</span>
+                            <span><strong>Color:</strong> ${currentTicket.color || 'N/A'}</span>
+                        </div>
+                        <p><strong>PO#:</strong> ${currentTicket.poNumber}</p>
+                        <p><strong>Date:</strong> ${formatDate(currentTicket.date)}</p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Flap Details</h5>
+                            <p><strong>Cut Flap Size:</strong> ${currentTicket.cutFlapSize || 'N/A'}</p>
+                            <p><strong>Flap Size:</strong> ${currentTicket.flapSize || 'N/A'}</p>
+                            <p><strong>Connected Flaps:</strong> ${currentTicket.connectedFlaps ? 'Yes' : 'No'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Tie Down Details</h5>
+                            <p><strong>Tie Downs #:</strong> ${currentTicket.tieDownsNumber || 'N/A'}</p>
+                            <p><strong>Tie Down Location:</strong> ${currentTicket.tieDownLocation || 'N/A'}</p>
+                            <p><strong>Tie Down Size:</strong> ${currentTicket.tieDownSize || 'N/A'}</p>
+                            <p><strong>Cut Tie Down Size:</strong> ${currentTicket.cutTieDownSize || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Other Components</h5>
+                            <p><strong>Connector #:</strong> ${currentTicket.connectorNumber || '1'}</p>
+                            <p><strong>Velcro #:</strong> ${currentTicket.velcroNumber || '0'}</p>
+                            <p><strong>Foam Size:</strong> ${currentTicket.foamSize || 'Standard'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Options</h5>
+                            <p><strong>Double Plastic:</strong> ${currentTicket.doublePlastic ? 'Yes' : 'No'}</p>
+                            <p><strong>Webbing:</strong> ${currentTicket.webbing ? 'Yes' : 'No'}</p>
+                            <p><strong>Metal For Lifter:</strong> ${currentTicket.metalForLifter ? 'Yes' : 'No'}</p>
+                            <p><strong>Steam Stopper:</strong> ${currentTicket.steamStopper ? 'Yes' : 'No'}</p>
+                            <p><strong>Rush Order:</strong> ${currentTicket.rushOrder ? 'Yes' : 'No'}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Additional Information</h5>
+                        <p><strong>Extra Notes:</strong></p>
+                        <p>${currentTicket.extraNotes || 'N/A'}</p>
+                    </div>
+                </div>
+                
+                ${currentUser.role === 'admin' ? `
+                <div class="no-print mt-4">
+                    <h5>Update Status</h5>
+                    <select class="form-select" id="status-select">
+                        <option ${currentTicket.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                        <option ${currentTicket.status === 'Cutting' ? 'selected' : ''}>Cutting</option>
+                        <option ${currentTicket.status === 'Sewing' ? 'selected' : ''}>Sewing</option>
+                        <option ${currentTicket.status === 'Found Vinyl' ? 'selected' : ''}>Found Vinyl</option>
+                        <option ${currentTicket.status === 'Cutting Foam' ? 'selected' : ''}>Cutting Foam</option>
+                        <option ${currentTicket.status === 'Stuffing' ? 'selected' : ''}>Stuffing</option>
+                        <option ${currentTicket.status === 'Done' ? 'selected' : ''}>Done</option>
+                    </select>
+                </div>
+                ` : ''}
+            `;
+
+            // Add event listener to status select for admins
+            if (currentUser.role === 'admin') {
+                document.getElementById('status-select').addEventListener('change', (e) => {
+                    currentTicket.status = e.target.value;
+                    updateTicket(currentTicket);
+                });
+            }
+
+            const ticketDetailModal = new bootstrap.Modal(document.getElementById('ticketDetailModal'));
+            ticketDetailModal.show();
+        }
+
+        function printTicket() {
+            const modalContent = document.getElementById('ticket-detail-content');
+            const printContent = modalContent.querySelector('.ticket-print').cloneNode(true);
+            
+            // Create a temporary container for printing
+            const printContainer = document.createElement('div');
+            printContainer.appendChild(printContent);
+            
+            // Generate PDF
+            const options = {
+                margin: 10,
+                filename: `ticket-${currentTicket.id}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(options).from(printContainer).save();
+        }
+
+        function saveTicket() {
+            const form = document.getElementById('ticket-form');
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const ticket = {
+                id: Date.now().toString(),
+                dealer: document.getElementById('dealer').value,
+                size: document.getElementById('size').value,
+                color: document.getElementById('color').value,
+                tieDownsNumber: document.getElementById('tieDownsNumber').value,
+                tieDownLocation: document.getElementById('tieDownLocation').value,
+                connectorNumber: document.getElementById('connectorNumber').value,
+                velcroNumber: document.getElementById('velcroNumber').value,
+                cutFlapSize: document.getElementById('cutFlapSize').value,
+                flapSize: document.getElementById('flapSize').value,
+                connectedFlaps: document.getElementById('connectedFlaps').checked,
+                tieDownSize: document.getElementById('tieDownSize').value,
+                cutTieDownSize: document.getElementById('cutTieDownSize').value,
+                doublePlastic: document.getElementById('doublePlastic').checked,
+                webbing: document.getElementById('webbing').checked,
+                metalForLifter: document.getElementById('metalForLifter').checked,
+                foamSize: document.getElementById('foamSize').value,
+                steamStopper: document.getElementById('steamStopper').checked,
+                rushOrder: document.getElementById('rushOrder').checked,   
+                poNumber: document.getElementById('poNumber').value,
+                date: document.getElementById('date').value || new Date().toISOString(),
+                extraNotes: document.getElementById('extraNotes').value,
+                status: 'Not Started'
+            };
+
+            tickets.push(ticket);
+            saveTicketsToGitHub();
+            bootstrap.Modal.getInstance(document.getElementById('addTicketModal')).hide();
+            form.reset();
+            form.classList.remove('was-validated');
+            renderTickets();
+        }
+
+        function updateTicket(updatedTicket) {
+            const index = tickets.findIndex(t => t.id === updatedTicket.id);
+            if (index !== -1) {
+                tickets[index] = updatedTicket;
+                saveTicketsToGitHub();
+                renderTickets();
+            }
+        }
+
+        function deleteTicket() {
+            if (!currentTicket) return;
+            
+            if (confirm('Are you sure you want to delete this ticket?')) {
+                tickets = tickets.filter(t => t.id !== currentTicket.id);
+                saveTicketsToGitHub();
+                
+                bootstrap.Modal.getInstance(document.getElementById('ticketDetailModal')).hide();
+                renderTickets();
+            }
+        }
+    </script>
+</body>
+</html>

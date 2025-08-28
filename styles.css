@@ -1,0 +1,295 @@
+/* styles.css */
+.ticket-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.status-badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+.form-section h5 {
+    color: #1b2780;
+}
+.drawer {
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    background-color: #151638;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+.drawer.open {
+    transform: translateX(0);
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+}
+.overlay.show {
+    display: block;
+}
+.user-info {
+    background-color: #151638;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.auth-container {
+    max-width: 500px;
+    margin: 100px auto;
+}
+#signin-btn {
+    visibility: visible;
+}
+#app-content {
+    display: none;
+}
+.gsi-material-button {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-appearance: none;
+    background-color: #151638;
+    background-image: none;
+    border: 1px solid #747775;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #1f1f1f;
+    cursor: pointer;
+    font-family: 'Roboto', arial, sans-serif;
+    font-size: 14px;
+    height: 40px;
+    letter-spacing: 0.25px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 12px;
+    position: relative;
+    text-align: center;
+    -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+    transition: background-color .218s, border-color .218s, box-shadow .218s;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: auto;
+    max-width: 400px;
+    min-width: min-content;
+}
+
+/* Print styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .ticket-print, .ticket-print * {
+        visibility: visible;
+    }
+    .ticket-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .modal-footer, .modal-header {
+        display: none !important;
+    }
+    .modal-content {
+        border: none;
+        box-shadow: none;
+    }
+}
+
+/* General background */
+body, #app-content {
+    background-color: #131436 !important;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6, .form-section h5, .card-title {
+    color: #e30c41 !important;
+}
+
+/* Buttons */
+.btn, .btn-primary, .btn-secondary, .btn-outline-secondary {
+    background-color: #e30c41 !important;
+    border-color: #e30c41 !important;
+    color: #ffffff !important;
+}
+
+.btn:hover, .btn:focus {
+    background-color: darken(#e30c41, 10%) !important;
+    border-color: darken(#e30c41, 10%) !important;
+}
+
+/* Navbar */
+.navbar.bg-primary {
+    background-color: #4e52b8 !important;
+}
+
+/* Drawer background */
+.drawer {
+    background-color: #151638; /* you can keep this darker for contrast or change to #131436 */
+}
+
+/* User info container */
+.user-info {
+    background-color: #131436;
+    color: #ffffff;
+}
+
+/* Form inputs and selects */
+.form-control, .form-select {
+    background-color: #1c1c3b;
+    color: #ffffff;
+    border: 1px solid #4e52b8;
+}
+
+/* Modal headers */
+.modal-header {
+    background-color: #4e52b8;
+    color: #ffffff;
+}
+.modal-footer {
+    background-color: #4e52b8;
+}
+
+/* Overlay */
+.overlay.show {
+    background-color: rgba(0,0,0,0.6);
+}
+
+/* Ticket card background */
+.ticket-card {
+    background-color: #131436;
+    color: #ffffff; /* text color for contrast */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #4e52b8; /* optional border to distinguish cards */
+}
+
+/* Ticket card hover */
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Add Ticket button */
+#add-ticket-btn, #add-ticket-empty-btn {
+    background-color: #252d77;
+    border-color: #252d77;
+    color: #ffffff;
+}
+
+#add-ticket-btn:hover, #add-ticket-empty-btn:hover {
+    background-color: #1f2460; /* slightly darker for hover */
+    border-color: #1f2460;
+}
+
+/* Status badges */
+.status-badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #ffffff;
+}
+
+/* Ticket Detail Modal */
+.modal-content {
+    background-color: #131436; /* Ticket background */
+    color: #ffffff; /* Text color */
+    border: 1px solid #4e52b8; /* Optional border */
+}
+
+.modal-header {
+    background-color: #4e52b8; /* Header background */
+    color: #ffffff;
+    border-bottom: 1px solid #4e52b8;
+}
+
+.modal-footer {
+    background-color: #4e52b8; /* Footer background */
+    color: #ffffff;
+    border-top: 1px solid #4e52b8;
+}
+
+/* Update Status select */
+#status-select {
+    background-color: #252d77; /* Ticket button color */
+    color: #ffffff;
+    border: 1px solid #252d77;
+}
+
+#status-select option {
+    background-color: #131436; /* Options background */
+    color: #ffffff;
+}
+
+.card-text small.text-muted {
+    color: #ffffff !important;
+}
+
+.nav-link.filter-link {
+    color: #ffffff !important;
+}
+
+.nav-link.filter-link.active {
+    color: #ffffff !important;
+}
+
+/* Rush Order Glow Animation */
+.rush-order-border {
+    position: relative;
+    border: 3px solid transparent;
+    border-radius: 0.5rem;
+    animation: glowRotate 2s linear infinite;
+}
+
+@keyframes glowRotate {
+    0% {
+        border-color: red;
+        box-shadow: 0 0 10px red;
+    }
+    25% {
+        border-color: orange;
+        box-shadow: 0 0 15px orange;
+    }
+    50% {
+        border-color: red;
+        box-shadow: 0 0 10px red;
+    }
+    75% {
+        border-color: orange;
+        box-shadow: 0 0 15px orange;
+    }
+    100% {
+        border-color: red;
+        box-shadow: 0 0 10px red;
+    }
+}
+
+

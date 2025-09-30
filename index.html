@@ -410,6 +410,9 @@
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('user-email').textContent = currentUser.email;
             document.getElementById('user-role').textContent = currentUser.role;
+
+            // now ads container has width, so re-push
+    (adsbygoogle = window.adsbygoogle || []).push({});
             
             // Set up UI based on user role
             const userRoleBadge = document.getElementById('user-role-badge');
@@ -806,4 +809,5 @@
 </body>
 
 </html>
+
 

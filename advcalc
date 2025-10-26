@@ -1,0 +1,215 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cut-Corner Calculator</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:linear-gradient(180deg,#071020 0%, #0b1320 100%);display:flex;align-items:center;justify-content:center;padding:24px;color:#e6eef6}
+    .wrap{width:100%;max-width:880px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:24px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    header{display:flex;align-items:center;gap:16px}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:6px 0 18px;color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+
+/* Input area */
+.display{display:flex;flex-direction:column;gap:8px}
+.input-row{display:flex;align-items:center;gap:8px}
+.textbox{flex:1;background:var(--glass);border:none;padding:12px 14px;border-radius:8px;color:inherit;font-size:18px}
+.textbox:focus{outline:2px solid rgba(6,182,212,0.15);box-shadow:0 4px 20px rgba(6,182,212,0.06)}
+
+.small{font-size:13px;color:var(--muted)}
+
+/* Numpad */
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.key{background:var(--glass);border-radius:8px;padding:14px;font-size:18px;text-align:center;cursor:pointer;user-select:none}
+.key:active{transform:translateY(1px)}
+.key.wide{grid-column:span 3}
+.key.op{background:rgba(6,182,212,0.08);color:var(--accent)}
+
+/* Results */
+.result{display:flex;flex-direction:column;gap:8px}
+.result .big{font-size:22px;font-weight:600}
+.result .mono{font-family:Menlo,monospace;color:#d7f7fb}
+
+footer{margin-top:14px;text-align:right;color:var(--muted);font-size:12px}
+
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Cut‑Corner Calculator</h1>
+        <div class="lead">Enter the diagonal cut length (in inches). The calculator returns the inset distance (for a 45° cut) in decimal and nearest 1/8" fraction.</div>
+      </div>
+    </header><div class="grid">
+  <section class="card">
+    <div class="display">
+      <label class="small">Diagonal cut length (inches)</label>
+      <div class="input-row">
+        <input id="input" class="textbox" inputmode="decimal" placeholder="e.g. 31 or 25" aria-label="Diagonal cut length in inches" />
+        <button id="clearBtn" class="key op" style="padding:10px 12px">Clear</button>
+      </div>
+
+      <div class="numpad" aria-hidden="false">
+        <div class="key" data-val="7">7</div>
+        <div class="key" data-val="8">8</div>
+        <div class="key" data-val="9">9</div>
+        <div class="key" data-val="4">4</div>
+        <div class="key" data-val="5">5</div>
+        <div class="key" data-val="6">6</div>
+        <div class="key" data-val="1">1</div>
+        <div class="key" data-val="2">2</div>
+        <div class="key" data-val="3">3</div>
+        <div class="key" data-val="0">0</div>
+        <div class="key" data-val=".">.</div>
+        <div class="key" id="backspace">⌫</div>
+        <div class="key wide op" id="pasteBtn">Paste</div>
+      </div>
+
+    </div>
+  </section>
+
+  <aside class="card result">
+    <div class="small">Result (inset distance for 45° cut)</div>
+    <div id="decimal" class="big mono">—</div>
+    <div id="fraction" class="small mono">—</div>
+    <div id="explain" class="small">Formula: inset = diagonal / √2</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="copyBtn" class="key op">Copy result</button>
+      <button id="examplesBtn" class="key">Examples</button>
+    </div>
+    <div id="examples" style="margin-top:12px;color:var(--muted);font-size:13px"></div>
+    <footer>Rounded to the nearest 1/8 inch.</footer>
+  </aside>
+</div>
+
+  </div>  <script>
+    const inputEl = document.getElementById('input');
+    const decimalEl = document.getElementById('decimal');
+    const fractionEl = document.getElementById('fraction');
+    const explainEl = document.getElementById('explain');
+    const examplesEl = document.getElementById('examples');
+
+    // Numpad behavior
+    document.querySelectorAll('.key').forEach(k=>{
+      k.addEventListener('click',()=>{
+        const v = k.getAttribute('data-val');
+        if(v!==null){ appendToInput(v); }
+      })
+    });
+
+    document.getElementById('backspace').addEventListener('click',()=>{
+      inputEl.value = inputEl.value.slice(0,-1);
+      update();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click',()=>{
+      inputEl.value=''; update(); inputEl.focus();
+    });
+
+    document.getElementById('pasteBtn').addEventListener('click',async ()=>{
+      try{
+        const t = await navigator.clipboard.readText();
+        inputEl.value = t.trim(); update();
+      }catch(e){ alert('Clipboard paste not available'); }
+    });
+
+    function appendToInput(ch){
+      // prevent multiple decimals
+      if(ch === '.' && inputEl.value.includes('.')) return;
+      inputEl.value += ch;
+      update();
+      inputEl.focus();
+    }
+
+    inputEl.addEventListener('input',update);
+
+    function parseNumber(s){
+      // accept things like "17 5/8" or "17-5/8" or decimals
+      s = s.trim();
+      if(!s) return NaN;
+      // mixed fraction
+      const mixedMatch = s.match(/^(\d+)\s+([0-9]+)\s*\/\s*([0-9]+)$/);
+      if(mixedMatch){
+        const whole = Number(mixedMatch[1]);
+        const num = Number(mixedMatch[2]);
+        const den = Number(mixedMatch[3]);
+        return whole + num/den;
+      }
+      // simple fraction like 5/8
+      const fracMatch = s.match(/^([0-9]+)\s*\/\s*([0-9]+)$/);
+      if(fracMatch){
+        return Number(fracMatch[1])/Number(fracMatch[2]);
+      }
+      // decimal or integer
+      const n = Number(s);
+      return isNaN(n)?NaN:n;
+    }
+
+    function toNearestEighth(val){
+      const eighths = Math.round(val * 8);
+      return eighths / 8;
+    }
+
+    function toMixedFraction(val){
+      const whole = Math.floor(Math.abs(val));
+      let rem = Math.abs(val) - whole;
+      let numer = Math.round(rem * 8);
+      let denom = 8;
+      if(numer === 0) return (val<0?'-':'') + whole + '"';
+      if(numer === denom){
+        return (val<0?'-':'') + (whole + 1) + '"';
+      }
+      // reduce fraction
+      const g = gcd(numer, denom);
+      numer /= g; denom /= g;
+      return (val<0?'-':'') + (whole>0? (whole + ' '): '') + numer + '/' + denom + '"';
+    }
+
+    function gcd(a,b){ if(!b) return a; return gcd(b, a % b); }
+
+    function update(){
+      const raw = inputEl.value.trim();
+      // Accept inputs like 31 or 25 or fractional. But primarily expect diagonal inches.
+      const d = parseNumber(raw);
+      if(isNaN(d)){
+        decimalEl.textContent = '—';
+        fractionEl.textContent = 'Enter a number like 31 or 25';
+        examplesEl.textContent = '';
+        return;
+      }
+      const inset = d / Math.SQRT2; // diagonal / sqrt(2)
+      const insetRounded = toNearestEighth(inset);
+      // format decimal to 3 places
+      decimalEl.textContent = insetRounded.toFixed(3) + '"';
+      fractionEl.textContent = toMixedFraction(insetRounded) + '  (raw: ' + inset.toFixed(4) + '" )';
+
+      examplesEl.innerHTML = '<strong>Examples:</strong> 31" → ' + toMixedFraction(toNearestEighth(31/Math.SQRT2)) + ' | 25" → ' + toMixedFraction(toNearestEighth(25/Math.SQRT2));
+    }
+
+    document.getElementById('copyBtn').addEventListener('click',async ()=>{
+      const text = decimalEl.textContent + ' — ' + fractionEl.textContent;
+      try{ await navigator.clipboard.writeText(text); alert('Copied: ' + text); }catch(e){ alert('Copy failed'); }
+    });
+
+    document.getElementById('examplesBtn').addEventListener('click',()=>{
+      inputEl.value = '31'; update(); inputEl.select();
+    });
+
+    // initialize
+    update();
+
+    // accessibility: allow keyboard numpad entry
+    inputEl.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') e.preventDefault();
+    });
+
+  </script></body>
+</html>

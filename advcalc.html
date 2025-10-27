@@ -1,95 +1,107 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simple Cut-Corner</title>
-  <style>
-    body{font-family:system-ui,Arial,sans-serif;background:#f6f8fb;color:#0b1220;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;padding:20px;}
-    .box{width:100%;max-width:420px;background:white;padding:20px;border-radius:10px;box-shadow:0 8px 24px rgba(12,20,40,0.08);}
-    h2{margin:0 0 12px;font-size:16px}
-    .output{font-size:18px;font-weight:600;margin-bottom:12px;min-height:28px}
-    .sub{color:#475569;font-size:13px;margin-bottom:10px}
-    input[type="text"]{width:100%;padding:10px 12px;font-size:16px;border:1px solid #e6edf3;border-radius:8px;box-sizing:border-box}
-    .note{margin-top:10px;color:#64748b;font-size:13px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cut Corner Calculator</title>
+<style>
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #f6f8fb;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+  }
+  button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #1d4ed8;
+  }
+  .result {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 15px;
+  }
+  .small {
+    color: #6b7280;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+</style>
 </head>
 <body>
-  <div class="box" role="region" aria-label="Cut corner calculator">
+  <div class="box">
     <h2>Cut-Corner Inset (45°)</h2>
-    <div id="output" class="output">Enter diagonal length below</div>
-    <div id="sub" class="sub"></div>
+    <div id="result" class="result">Enter a number and press Calculate</div>
+    <div id="fraction" class="small"></div>
 
-    <label for="diag" style="display:none">Diagonal length (inches)</label>
-    <input id="diag" type="text" inputmode="decimal" placeholder="e.g. 31 or 25 or 17 5/8">
+    <input id="input" type="text" inputmode="decimal" placeholder="e.g. 31 or 25" />
+    <button id="calcBtn">Calculate</button>
 
-    <div class="note">Formula used: inset = diagonal ÷ √2. Results rounded to nearest 1/8".</div>
+    <div class="small">Formula: inset = diagonal ÷ √2</div>
   </div>
 
-  <script>
-    const inp = document.getElementById('diag');
-    const out = document.getElementById('output');
-    const sub = document.getElementById('sub');
+<script>
+const input = document.getElementById('input');
+const result = document.getElementById('result');
+const fraction = document.getElementById('fraction');
+const button = document.getElementById('calcBtn');
 
-    function parseNumber(s){
-      s = (s||'').trim();
-      if(!s) return NaN;
-      // support mixed fraction like "17 5/8"
-      let mixed = s.match(/^(-?\\d+)\\s+([0-9]+)\\s*\\/\\s*([0-9]+)$/);
-      if(mixed){
-        let sign = mixed[1].startsWith('-') ? -1 : 1;
-        let whole = Math.abs(Number(mixed[1]));
-        let num = Number(mixed[2]), den = Number(mixed[3]);
-        return sign * (whole + num/den);
-      }
-      let frac = s.match(/^(-?\\d+)\\s*\\/\\s*([0-9]+)$/);
-      if(frac){
-        return Number(frac[1]) / Number(frac[2]);
-      }
-      let n = Number(s.replace(/[^0-9\\-\\.]/g,'')); // allow simple cleanup
-      return isNaN(n)?NaN:n;
-    }
+function gcd(a,b){ return b ? gcd(b, a % b) : a; }
 
-    function toNearestEighth(val){
-      return Math.round(val*8)/8;
-    }
-    function gcd(a,b){ if(!b) return a; return gcd(b, a % b); }
-    function toMixedFraction(val){
-      if(!isFinite(val)) return '';
-      const neg = val < 0;
-      val = Math.abs(val);
-      const whole = Math.floor(val);
-      let rem = val - whole;
-      let numer = Math.round(rem * 8);
-      let denom = 8;
-      if(numer === 0) return (neg?'-':'') + whole + '"';
-      if(numer === denom) return (neg?'-':'') + (whole + 1) + '"';
-      // reduce
-      const g = gcd(numer, denom);
-      numer /= g; denom /= g;
-      return (neg?'-':'') + (whole>0? whole + ' ' : '') + numer + '/' + denom + '"';
-    }
+function toMixedFraction(val){
+  const whole = Math.floor(val);
+  let frac = val - whole;
+  let num = Math.round(frac * 8);
+  let den = 8;
+  if(num === 0) return `${whole}"`;
+  if(num === den) return `${whole + 1}"`;
+  const g = gcd(num, den);
+  num /= g; den /= g;
+  return `${whole > 0 ? whole + " " : ""}${num}/${den}"`;
+}
 
-    function update(){
-      const raw = inp.value;
-      const diag = parseNumber(raw);
-      if(isNaN(diag)){
-        out.textContent = raw.trim() ? 'Invalid number' : 'Enter diagonal length below';
-        sub.textContent = '';
-        return;
-      }
-      const inset = diag / Math.SQRT2;
-      const insetRounded = toNearestEighth(inset);
-      out.textContent = insetRounded.toFixed(3) + '"';
-      sub.textContent = 'Fraction (nearest 1/8): ' + toMixedFraction(insetRounded) + '  — raw: ' + inset.toFixed(4) + '"';
-    }
-
-    inp.addEventListener('input', update);
-    // allow pressing Enter to select/preserve value
-    inp.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') e.preventDefault(); });
-
-    // initial
-    update();
-  </script>
+button.addEventListener('click', () => {
+  const d = parseFloat(input.value);
+  if (isNaN(d) || d <= 0) {
+    result.textContent = "Please enter a valid number";
+    fraction.textContent = "";
+    return;
+  }
+  const inset = d / Math.SQRT2;
+  const insetRounded = Math.round(inset * 8) / 8;
+  result.textContent = `${insetRounded.toFixed(3)}"`;
+  fraction.textContent = `≈ ${toMixedFraction(insetRounded)}  (raw: ${inset.toFixed(4)}")`;
+});
+</script>
 </body>
 </html>

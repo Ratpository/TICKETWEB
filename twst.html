@@ -1,0 +1,246 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Radiant Wash | Driveways & Concrete Power Washing</title>
+  <meta name="description" content="Professional driveway and concrete power washing. Fast quotes, fair pricing, spotless results." />
+  <meta property="og:title" content="Radiant Wash" />
+  <meta property="og:description" content="Driveways and concrete pressure washing. Get a free quote today." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="twst.css" />
+  <link rel="icon" href="favicon.ico" />
+</head>
+<body>
+  <!-- Sticky call now button -->
+  <a class="call-fab" href="tel:+16572588632" aria-label="Call now">📞</a>
+
+  <header class="topbar">
+    <div class="container row between center">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e90ff"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="url(#g)"/><path d="M18 36c6 0 9-10 14-10s8 10 14 10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+        <span class="brand-text">Radiant Wash</span>
+      </div>
+      <nav class="nav">
+        <a href="#services">Services</a>
+        <a href="#process">Process</a>
+        <a href="#quote" class="btn btn-primary">Free quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container grid-2">
+        <div>
+          <h1>Driveways and concrete cleaned right.</h1>
+          <p class="lead">Oil stains out. Mildew gone. Curb appeal up. Get a firm price today.</p>
+          <div class="cta">
+            <a href="#quote" class="btn btn-primary">Get my free quote</a>
+            <a href="tel:+16572588632" class="btn btn-outline">Call now</a>
+          </div>
+          <ul class="badges">
+            <li>Licensed & insured</li>
+            <li>Eco‑friendly detergents</li>
+            <li>Weekend availability</li>
+          </ul>
+        </div>
+        <div class="hero-card">
+          <img src="https://images.unsplash.com/photo-1564979313730-4f3f2dd5ce8e?q=80&w=1400&auto=format&fit=crop" alt="Before and after clean concrete" loading="lazy"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="section">
+      <div class="container">
+        <h2>Services</h2>
+        <div class="cards">
+          <article class="card">
+            <h3>Driveway cleaning</h3>
+            <p>Pressure wash and surface clean for concrete and pavers. Degreasing included.</p>
+          </article>
+          <article class="card">
+            <h3>Walkways & patios</h3>
+            <p>Even, streak‑free finish on sidewalks, entries, and back patios.</p>
+          </article>
+          <article class="card">
+            <h3>Concrete seal (optional)</h3>
+            <p>Penetrating sealer to reduce staining and make future cleans faster.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section id="process" class="section alt">
+      <div class="container">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li>
+            <span class="step-num">1</span>
+            <div>
+              <h4>Share the details</h4>
+              <p>Send the driveway size, stain type, and a photo if possible.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <div>
+              <h4>Get a firm quote</h4>
+              <p>Transparent price before scheduling. No surprises.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <div>
+              <h4>We clean</h4>
+              <p>Pro equipment. Safe pressure. Uniform results.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Quote form -->
+    <section id="quote" class="section">
+      <div class="container">
+        <h2>Free quote</h2>
+        <p>Fill this out. You get an email confirmation and a follow‑up call.</p>
+        <form id="quoteForm" class="form" enctype="multipart/form-data">
+          <div class="grid">
+            <label>
+              <span>Name</span>
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" required />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="tel" name="phone" required />
+            </label>
+            <label>
+              <span>Address</span>
+              <input type="text" name="address" placeholder="City or zip is fine" />
+            </label>
+            <label>
+              <span>Driveway size</span>
+              <select name="size">
+                <option value="single">Single car</option>
+                <option value="double">Double car</option>
+                <option value="rv">RV / extra‑wide</option>
+              </select>
+            </label>
+            <label>
+              <span>Stain level</span>
+              <select name="stains">
+                <option value="light">Light</option>
+                <option value="moderate">Moderate</option>
+                <option value="heavy">Heavy oil/rust</option>
+              </select>
+            </label>
+            <label class="full">
+              <span>Preferred date</span>
+              <input type="date" name="date" />
+            </label>
+            <label class="full">
+              <span>Notes</span>
+              <textarea name="notes" rows="4" placeholder="Any specifics or access notes"></textarea>
+            </label>
+            <label class="full file">
+              <span>Photo (optional)</span>
+              <input type="file" name="photo" accept="image/*" />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Send quote request</button>
+            <p id="formStatus" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="tiny">By submitting you agree to be contacted by phone or email for scheduling.</p>
+      </div>
+    </section>
+
+    <!-- Testimonials / Proof -->
+    <section class="section alt">
+      <div class="container">
+        <h2>Results</h2>
+        <div class="gallery">
+          <figure>
+            <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?q=80&w=1200&auto=format&fit=crop" alt="Clean concrete" loading="lazy"/>
+            <figcaption>Uniform finish. No tiger stripes.</figcaption>
+          </figure>
+          <figure>
+            <img src="https://images.unsplash.com/photo-1520974794209-6bcd8e4a7db1?q=80&w=1200&auto=format&fit=crop" alt="Surface cleaner" loading="lazy"/>
+            <figcaption>Commercial surface cleaner for even coverage.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container row between">
+      <p>© <span id="y"></span> Radiant Wash. Driveways & Concrete.</p>
+      <p><a href="tel:+16572588632">Call: (657) 258‑8632</a> · <a href="#quote">Free quote</a></p>
+    </div>
+  </footer>
+
+  <!-- EmailJS for client-side email without a backend -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // 1) Replace with your EmailJS IDs
+    const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; // e.g. yx123...
+    const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID"; // e.g. service_xyz
+    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID"; // e.g. template_abc
+
+    // 2) Initialize EmailJS
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+    // 3) Handle form submission
+    const form = document.getElementById('quoteForm');
+    const statusEl = document.getElementById('formStatus');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = 'Sending...';
+
+      // Build an object from form fields
+      const fd = new FormData(form);
+      const data = Object.fromEntries(fd.entries());
+
+      // If a file is attached, convert to base64 for EmailJS
+      if (fd.get('photo') && fd.get('photo').name) {
+        const file = fd.get('photo');
+        data.photo_filename = file.name;
+        data.photo_base64 = await toBase64(file);
+      }
+
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, data);
+        statusEl.textContent = 'Sent. Check your email.';
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error sending. Verify EmailJS keys.';
+      }
+    });
+
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

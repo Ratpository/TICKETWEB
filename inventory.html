@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material Inventory</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>Material Inventory</h1>
+<p id="lastUpdated"></p>
+</header>
+
+<section id="loginSection">
+<input type="password" id="password" placeholder="Admin password">
+<button onclick="login()">Admin Login</button>
+</section>
+
+<section id="inventory">
+
+<h2>Foam</h2>
+<div id="foamList"></div>
+
+<h2>Channeling</h2>
+<div id="channelList"></div>
+
+</section>
+
+<section>
+
+<h2>Purchase Recommendations</h2>
+<div id="recommendList"></div>
+
+<button id="saveBtn" onclick="saveInventory()">Save Daily Update</button>
+<button onclick="exportPO()">Export Purchase Order</button>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>

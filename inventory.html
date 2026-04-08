@@ -1,43 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Material Inventory</title>
-<link rel="stylesheet" href="inventory.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory System</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="app.js"></script>
 </head>
 
 <body>
 
-<header>
-<h1>Material Inventory</h1>
-<p id="lastUpdated"></p>
-</header>
+<div id="screen"></div>
 
-<section id="loginSection">
-<input type="password" id="password" placeholder="Admin password">
-<button onclick="login()">Admin Login</button>
-</section>
+<!-- NAV BAR -->
+<div class="nav">
 
-<section id="inventory">
+<button onclick="setTab('po')">📦</button>
+<button onclick="setTab('updates')">📝</button>
 
-<h2>Foam</h2>
-<div id="foamList"></div>
+<div class="centerBtn" onclick="setTab('inventory')">
+📊
+</div>
 
-<h2>Channeling</h2>
-<div id="channelList"></div>
+<button onclick="setTab('users')">👥</button>
+<button onclick="setTab('rush')">⚡</button>
 
-</section>
+</div>
 
-<section>
+<!-- FILTER POPUP -->
+<div id="filterMenu"></div>
 
-<h2>Purchase Recommendations</h2>
-<div id="recommendList"></div>
-
-<button id="saveBtn" onclick="saveInventory()">Save Daily Update</button>
-<button onclick="exportPO()">Export Purchase Order</button>
-
-</section>
-
-<script src="inventory.js"></script>
 </body>
 </html>

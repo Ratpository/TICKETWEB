@@ -1,148 +1,111 @@
-const ADMIN_PASSWORD = "changeme";
+let currentTab = "inventory"
 
-const buffer = 5;
+const materials=[
+"4-2 84","4-2 96","2 96","4 flat 96","4 flat 140",
+"4-2 140","5-2.5 84","5-2.5 96","5-2.5 110",
+"5-2 flat 96","5-2 flat 140",
+"chan 140","chan 96","chan 84"
+]
 
-const minimum = {
-"4-2 84":10,
-"4-2 96":10,
-"2 96":10,
-"4 flat 96":10,
-"4 flat 140":10,
-"4-2 140":10,
-"5-2.5 84":10,
-"5-2.5 96":10,
-"5-2.5 110":10,
-"5-2 flat 96":10,
-"5-2 flat 140":10,
-"chan 140":15,
-"chan 96":15,
-"chan 84":15
-};
+let selectedFilter = null
 
-let inventory = JSON.parse(localStorage.getItem("inventory")) || {};
-
-Object.keys(minimum).forEach(k=>{
-if(!inventory[k]) inventory[k]=0;
-});
-
-function login(){
-let p=document.getElementById("password").value;
-if(p===ADMIN_PASSWORD){
-document.querySelectorAll("input").forEach(i=>i.disabled=false);
-document.getElementById("saveBtn").style.display="block";
-}
+function setTab(tab){
+currentTab = tab
+render()
 }
 
-function createCard(container,name){
+/* INVENTORY FILTER */
+function toggleFilter(){
 
-let card=document.createElement("div");
-card.className="card";
+let menu = document.getElementById("filterMenu")
 
-card.innerHTML=`
-<span>${name}</span>
-<input disabled type="number" id="${name}" value="${inventory[name]}">
-`;
+menu.style.display = menu.style.display === "block" ? "none" : "block"
 
-container.appendChild(card);
+menu.innerHTML=""
+
+materials.forEach(m=>{
+let btn = document.createElement("button")
+btn.innerText = m
+btn.style.width="100%"
+btn.style.padding="10px"
+btn.onclick=()=>{
+selectedFilter = m
+menu.style.display="none"
+render()
+}
+menu.appendChild(btn)
+})
+
 }
 
-function build(){
+/* RENDER SCREEN */
+function render(){
 
-let foam=document.getElementById("foamList");
-let channel=document.getElementById("channelList");
+const screen = document.getElementById("screen")
+screen.innerHTML=""
 
-foam.innerHTML="";
-channel.innerHTML="";
+/* INVENTORY */
+if(currentTab === "inventory"){
 
-createCard(foam,"4-2 84");
-createCard(foam,"4-2 96");
-createCard(foam,"2 96");
-createCard(foam,"4 flat 96");
-createCard(foam,"4 flat 140");
-createCard(foam,"4-2 140");
-createCard(foam,"5-2.5 84");
-createCard(foam,"5-2.5 96");
-createCard(foam,"5-2.5 110");
-createCard(foam,"5-2 flat 96");
-createCard(foam,"5-2 flat 140");
+let filterBtn = document.createElement("button")
+filterBtn.innerText = selectedFilter || "All Materials"
+filterBtn.onclick = toggleFilter
+filterBtn.style.width="100%"
+filterBtn.style.padding="15px"
 
-createCard(channel,"chan 140");
-createCard(channel,"chan 96");
-createCard(channel,"chan 84");
+screen.appendChild(filterBtn)
 
-calculate();
+materials
+.filter(m => !selectedFilter || m === selectedFilter)
+.forEach(m=>{
+
+let card = document.createElement("div")
+card.className="card"
+
+card.innerHTML=`<span>${m}</span><span>0</span>`
+
+screen.appendChild(card)
+
+})
+
 }
 
-function saveInventory(){
+/* PURCHASE ORDER */
+if(currentTab === "po"){
 
-document.querySelectorAll("input[type=number]").forEach(i=>{
-inventory[i.id]=parseInt(i.value)||0;
-});
+screen.innerHTML = "<h2>Purchase Orders</h2>"
 
-localStorage.setItem("inventory",JSON.stringify(inventory));
-localStorage.setItem("updated",new Date().toLocaleDateString());
-
-calculate();
 }
 
-function calculate(){
+/* UPDATES */
+if(currentTab === "updates"){
 
-let container=document.getElementById("recommendList");
-container.innerHTML="";
+screen.innerHTML = "<h2>Recent Updates</h2>"
 
-Object.keys(inventory).forEach(item=>{
-
-let current=inventory[item];
-let min=minimum[item];
-let recommend=Math.max(0,(min+buffer)-current);
-
-let card=document.createElement("div");
-
-card.className="card";
-
-if(current<min){
-card.classList.add("low");
-}else{
-card.classList.add("good");
 }
 
-card.innerHTML=`
-<span>${item}</span>
-<span>Buy: ${recommend}</span>
-`;
+/* USERS */
+if(currentTab === "users"){
 
-container.appendChild(card);
+screen.innerHTML = "<h2>User Management</h2>"
 
-});
+}
 
-let updated=localStorage.getItem("updated");
-if(updated){
-document.getElementById("lastUpdated").innerText="Last updated: "+updated;
+/* RUSH ORDERS */
+if(currentTab === "rush"){
+
+screen.innerHTML = `
+<h2>Rush Orders</h2>
+
+<input placeholder="Ticket Name">
+<input placeholder="Size">
+<input placeholder="Color">
+
+<button style="margin-top:10px;padding:15px;width:100%;">Add Rush Order</button>
+`
+
 }
 
 }
 
-function exportPO(){
-
-let text="Purchase Order\n\n";
-
-Object.keys(inventory).forEach(item=>{
-
-let need=Math.max(0,(minimum[item]+buffer)-inventory[item]);
-
-if(need>0){
-text+=item+" - "+need+"\n";
-}
-
-});
-
-let blob=new Blob([text],{type:"text/plain"});
-let link=document.createElement("a");
-
-link.href=URL.createObjectURL(blob);
-link.download="purchase_order.txt";
-link.click();
-
-}
-
-build();
+render()
